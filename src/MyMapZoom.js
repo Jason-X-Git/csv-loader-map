@@ -30,10 +30,11 @@ const MyMap = () => {
 
     const loadData = async (data) => {
         try {
-            // const structureJsonArray = readJSON();
-            const structureJsonArray = await data;
-            console.log('Data type: ', typeof data, 'data length: ', data.length)
-            //   const structureIDList = structureJsonArray.map((pt) => pt.id);
+            const structurePoints = data.filter(pt => !!pt.order && pt.latitude && pt.longitude);
+            const otherPoints = data.filter(pt => !pt.order && pt.latitude && pt.longitude)
+            console.log('Structure Data: ', 'data length: ', structurePoints.length, 'sample: ', structurePoints[0])
+            console.log('Other Data: ', 'data length: ', otherPoints.length, 'sample: ', otherPoints[0])
+            //   const structureIDList = structurePoints.map((pt) => pt.id);
             const options = {
                 url: "https://js.arcgis.com/4.18/init.js",
                 css: "https://js.arcgis.com/4.18/esri/themes/light/main.css",
@@ -64,10 +65,10 @@ const MyMap = () => {
                 options
             );
 
-            function buildPoints() {
+            const buildStructurePoints = () => {
                 //loop through the items and add to the feature layer
                 const features = [];
-                array.forEach(structureJsonArray, function (item) {
+                array.forEach(structurePoints, function (item) {
                     // console.log("item", item);
                     const attr = {};
                     //pull in any additional attributes if required
@@ -77,6 +78,7 @@ const MyMap = () => {
                     attr["longitude"] = item.longitude;
                     attr["latitude"] = item.latitude;
                     attr["measure"] = item.measure;
+                    attr["code"] = item.code;
 
                     const geometry = new Point(item.longitude, item.latitude);
 
@@ -91,6 +93,33 @@ const MyMap = () => {
                 return features;
             }
 
+
+            const buildOtherPoints = () => {
+                //loop through the items and add to the feature layer
+                const features = [];
+                array.forEach(otherPoints, function (item) {
+                    // console.log("item", item);
+                    const attr = {};
+                    //pull in any additional attributes if required
+                    attr["id"] = item.id;
+                    attr["longitude"] = item.longitude;
+                    attr["latitude"] = item.latitude;
+                    attr["code"] = item.code;
+                    // attr["attributes"] = item.attributes;
+
+                    const geometry = new Point(item.longitude, item.latitude);
+
+                    const graphic = new Graphic({
+                        geometry: geometry,
+                        attributes: attr,
+                    });
+                    features.push(graphic);
+                });
+
+                  console.log("retrieved ", features.length, " points");
+                return features;
+            }
+
             const groupBy = (key) => (array) =>
                 array.reduce((objectsByKeyValue, obj) => {
                     const value = obj[key];
@@ -101,7 +130,7 @@ const MyMap = () => {
                 }, {});
 
             const groupedByProfile = groupBy("profile");
-            const profileDict = groupedByProfile(structureJsonArray);
+            const profileDict = groupedByProfile(structurePoints);
             // console.log('profile dict', profileDict)
             const profileInfoDict = {};
             Object.keys(profileDict).map((profileNo) => {
@@ -180,11 +209,11 @@ const MyMap = () => {
                 return [linesArray, lineRenderer];
             };
 
-            function createPolylinesLayer() {
+            const createPolylinesLayer = () => {
                 const [linesArray, lineRenderer] = buildLines();
                 //   console.log("line arrays", linesArray);
                 //   console.log("line render", lineRenderer);
-                const linesLayer = new FeatureLayer({
+                return new FeatureLayer({
                     source: linesArray,
                     objectIdField: "objectID",
                     fields: [
@@ -208,16 +237,15 @@ const MyMap = () => {
                     renderer: lineRenderer,
                     title: "Profiles",
                 });
-                return linesLayer;
             }
 
             //  Creates a client-side FeatureLayer from an array of graphics
-            function createPointsLayer() {
-                const pointFeatures = buildPoints();
-                //   console.log("points list", pointFeatures);
+            const createStructuresPointsLayer = () => {
+                const structuresFeatures = buildStructurePoints();
+                //   console.log("points list", structuresFeatures);
 
-                const pointsLayer = new FeatureLayer({
-                    source: pointFeatures,
+                return new FeatureLayer({
+                    source: structuresFeatures,
                     objectIdField: "id",
                     fields: [
                         {
@@ -244,9 +272,13 @@ const MyMap = () => {
                             name: "measure",
                             type: "double",
                         },
+                        {
+                            name: "code",
+                            type: "string",
+                        },
                     ],
                     popupTemplate: {
-                        title: "Point",
+                        title: "Structure Point",
                         expressionInfos: [
                             {
                                 name: "measure-roundup",
@@ -270,13 +302,60 @@ const MyMap = () => {
                             },
                         },
                     },
-                    labelingInfo: pointsLabels,
+                    labelingInfo: structuresLabels,
                     title: "Structure Points",
                 });
-                return pointsLayer;
             }
 
-            const pointsLabels = {
+
+            const createOtherPointsLayer = () => {
+                const otherPointsFeatures = buildOtherPoints();
+                console.log("other points number", otherPointsFeatures.length);
+                return new FeatureLayer({
+                    source: otherPointsFeatures,
+                    objectIdField: "id",
+                    fields: [
+                        {
+                            name: "id",
+                            type: "oid",
+                        },
+                        {
+                            name: "latitude",
+                            type: "double",
+                        },
+                        {
+                            name: "longitude",
+                            type: "double",
+                        },
+                        {
+                            name: "code",
+                            type: "string",
+                        },
+                    ],
+                    popupTemplate: {
+                        title: "Non-Structure Point",
+                        content:
+                            "Point {id} - {code}.",
+                    },
+                    renderer: {
+                        type: "simple", // autocasts as new SimpleRenderer()
+                        symbol: {
+                            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+                            size: 5,
+                            color: "black",
+                            outline: {
+                                // autocasts as new SimpleLineSymbol()
+                                width: 0.5,
+                                color: "white",
+                            },
+                        },
+                    },
+                    labelingInfo: otherPointsLabels,
+                    title: "Non-Structure Points",
+                });
+            }
+
+            const structuresLabels = {
                 symbol: {
                     type: "text",
                     color: "red",
@@ -296,6 +375,26 @@ const MyMap = () => {
                 deconflictionStrategy: "static",
             };
 
+            const otherPointsLabels = {
+                symbol: {
+                    type: "text",
+                    color: "black",
+                    haloColor: "white",
+                    haloSize: "1px",
+                    font: {
+                        size: "13px",
+                        family: "Noto Sans",
+                        style: "italic",
+                        weight: "bolder",
+                    },
+                },
+                labelPlacement: "above-right",
+                labelExpressionInfo: {
+                    expression: "$feature.code",
+                },
+                deconflictionStrategy: "static",
+            };
+
             const zoomToLayer = (layer) => {
                 //   console.log(`Zoom to ${layer.title}`);
                 return layer.queryExtent().then(function (response) {
@@ -307,17 +406,18 @@ const MyMap = () => {
                 });
             };
 
-            const pointsLayer = createPointsLayer();
+            const structuresLayer = createStructuresPointsLayer();
+            const otherPointsLayer = createOtherPointsLayer();
             const linesLayer = createPolylinesLayer();
 
             linesLayer.when(function () {
-                console.log('Zoom to line layer')
+                // console.log('Zoom to line layer')
                 zoomToLayer(linesLayer);
             });
 
             const map = new Map({
                 basemap: "hybrid",
-                layers: [linesLayer, pointsLayer],
+                layers: [linesLayer, otherPointsLayer, structuresLayer],
             });
 
             const view = new MapView({
@@ -333,96 +433,7 @@ const MyMap = () => {
                 },
             });
 
-            const layerList = new LayerList({
-                view: view,
-                listItemCreatedFunction: createActions,
-                container: "layerListDiv",
-            });
-            view.ui.add(layerList, "top-right");
-
-            // definitionExpressions used by each action
-            // listed in the LayerList
-
-            const profileExpressions = new Collection(
-                ["All", ...Object.keys(profileInfoDict)].map((profileNo) => ({
-                    id: profileNo,
-                    expression: `objectID = '${profileNo}'`,
-                }))
-            );
-
-            // When an action is triggered, the definitionExpression
-            // is set on the layer and the view's extent updates
-            // to match the features visible in the layer
-
-            const queryProfile = linesLayer.createQuery();
-            let highlightSelect;
-            view.whenLayerView(linesLayer).then((layerView) => {
-                const fullExtent = linesLayer.fullExtent;
-                layerList.on("trigger-action", function (event) {
-                    const actionId = event.action.id;
-                    const layer = event.item.layer;
-
-                    const queryExpression = profileExpressions.find(function (item) {
-                        return item.id === actionId;
-                    }).expression;
-                    // console.log("Expression: ", queryExpression);
-
-                    if (!queryExpression.includes("All")) {
-                        queryProfile.where = queryExpression;
-                        layer.queryFeatures(queryProfile).then((result) => {
-                            // if a feature is already highlighted, then remove the highlight
-                            if (highlightSelect) {
-                                highlightSelect.remove();
-                            }
-
-                            // the feature to be highlighted
-                            const feature = result.features[0];
-
-                            // use the objectID to highlight the feature
-                            highlightSelect = layerView.highlight(
-                                feature.attributes["objectID"]
-                            );
-                            const ext = feature.geometry.extent;
-                            const cloneExt = ext.clone();
-                            // center the feature
-                            view
-                                .goTo(
-                                    {
-                                        target: feature.geometry,
-                                        extent: cloneExt.expand(1.5),
-                                    },
-                                    {
-                                        duration: 2000,
-                                        easing: "in-out-expo",
-                                    }
-                                )
-                                .catch(function (error) {
-                                    if (error.name != "AbortError") {
-                                        console.log(error);
-                                    }
-                                });
-                        });
-                    } else {
-                        view
-                            .goTo(
-                                {
-                                    target: fullExtent,
-                                },
-                                {
-                                    duration: 2000,
-                                    easing: "in-out-expo",
-                                }
-                            )
-                            .catch(function (error) {
-                                if (error.name != "AbortError") {
-                                    console.log(error);
-                                }
-                            });
-                    }
-                });
-            });
-
-            function createActions(event) {
+            const createActions = (event) => {
                 const item = event.item;
                 //   console.log("item", item);
 
@@ -448,6 +459,85 @@ const MyMap = () => {
                     ];
                 }
             }
+            const layerList = new LayerList({
+                view: view,
+                listItemCreatedFunction: createActions,
+                container: "layerListDiv",
+            });
+            view.ui.add(layerList, "top-right");
+
+            // definitionExpressions used by each action
+            // listed in the LayerList
+
+            const profileExpressions = new Collection(
+                ["All", ...Object.keys(profileInfoDict)].map((profileNo) => ({
+                    id: profileNo,
+                    expression: `objectID = '${profileNo}'`,
+                }))
+            );
+
+            // When an action is triggered, the definitionExpression
+            // is set on the layer and the view's extent updates
+            // to match the features visible in the layer
+
+            const queryProfile = linesLayer.createQuery();
+            view.whenLayerView(linesLayer).then((layerView) => {
+                const fullExtent = linesLayer.fullExtent;
+                layerList.on("trigger-action", (event) => {
+                    const actionId = event.action.id;
+                    const layer = event.item.layer;
+
+                    const queryExpression = profileExpressions.find((item) => {
+                        return item.id === actionId;
+                    }).expression;
+                    // console.log("Expression: ", queryExpression);
+
+                    if (!queryExpression.includes("All")) {
+                        queryProfile.where = queryExpression;
+                        layer.queryFeatures(queryProfile).then((result) => {
+                            // the feature to be highlighted
+                            const feature = result.features[0];
+
+                            const ext = feature.geometry.extent;
+                            const cloneExt = ext.clone();
+                            // center the feature
+                            view
+                                .goTo(
+                                    {
+                                        target: feature.geometry,
+                                        extent: cloneExt.expand(1.5),
+                                    },
+                                    {
+                                        duration: 2000,
+                                        easing: "in-out-expo",
+                                    }
+                                )
+                                .catch((error) => {
+                                    if (error.name !== "AbortError") {
+                                        console.log(error);
+                                    }
+                                });
+                        });
+                    } else {
+                        view
+                            .goTo(
+                                {
+                                    target: fullExtent,
+                                },
+                                {
+                                    duration: 2000,
+                                    easing: "in-out-expo",
+                                }
+                            )
+                            .catch((error) => {
+                                if (error.name !== "AbortError") {
+                                    console.log(error);
+                                }
+                            });
+                    }
+                });
+            });
+
 
             const coordsWidget = document.createElement("div");
             coordsWidget.id = "coordsWidget";

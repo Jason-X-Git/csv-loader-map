@@ -11,13 +11,27 @@ const MyDropZone = () => {
             .filter(item => !!item)
             .map(item => {
                     const obj = item.data
-                    return {
-                        id: obj.id,
-                        profile: parseInt(obj.profile),
-                        order: parseInt(obj.order),
-                        longitude: parseFloat(obj.longitude),
-                        latitude: parseFloat(obj.latitude),
-                        measure: parseFloat(obj.measure),
+                    if (item.data.order && item.data.order.length > 0) {
+                        return {
+                            id: obj.id,
+                            code: obj.code,
+                            profile: obj.profile,
+                            order: obj.order,
+                            longitude: parseFloat(obj.longitude),
+                            latitude: parseFloat(obj.latitude),
+                            measure: parseFloat(obj.measure),
+                            attributes: null,
+                        }
+
+                    } else {
+
+                        return {
+                            id: obj.id,
+                            code: obj.code,
+                            longitude: parseFloat(obj.longitude),
+                            latitude: parseFloat(obj.latitude),
+                            attributes: null,
+                        }
                     }
                 }
             )
