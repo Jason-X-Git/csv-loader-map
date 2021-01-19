@@ -32,6 +32,18 @@ const MyMap = () => {
         try {
             const structurePoints = data.filter(pt => !!pt.order && pt.latitude && pt.longitude);
             const otherPoints = data.filter(pt => !pt.order && pt.latitude && pt.longitude)
+            const profileNoList = structurePoints.map(s => s.profile)
+                .filter((value, index, self) => self.indexOf(value) === index)
+            const randomColors = randomcolor({
+                luminosity: "bright",
+                count: profileNoList.length,
+                hue: "red"
+            })
+            const colorDict = {}
+            profileNoList.forEach((profileNo, i) => {
+                colorDict[profileNo] = randomColors[i]
+            })
+            console.log('Colors: ', colorDict)
             console.log('Structure Data: ', 'data length: ', structurePoints.length, 'sample: ', structurePoints[0])
             console.log('Other Data: ', 'data length: ', otherPoints.length, 'sample: ', otherPoints[0])
             //   const structureIDList = structurePoints.map((pt) => pt.id);
@@ -74,6 +86,7 @@ const MyMap = () => {
                     //pull in any additional attributes if required
                     attr["id"] = item.id;
                     if (item.order) {
+                        attr["mark"] = item.mark;
                         attr["profile"] = item.profile;
                         attr["order"] = item.order;
                         attr["measure"] = item.measure;
@@ -163,7 +176,7 @@ const MyMap = () => {
                         symbol: {
                             type: "simple-line", // autocasts as SimpleLineSymbol()
                             color: color,
-                            width: 3,
+                            width: 5,
                         },
                         label: value,
                     };
@@ -175,10 +188,7 @@ const MyMap = () => {
                     uniqueValueInfos: Object.keys(profileInfoDict).map((profileNo) =>
                         createLineSymbol(
                             profileNo,
-                            randomcolor({
-                                luminosity: "bright",
-                                hue: "red",
-                            })
+                            colorDict[profileNo]
                         )
                     ),
                 };
@@ -221,6 +231,20 @@ const MyMap = () => {
                 const structuresFeatures = buildPointsFeatures(structurePoints);
                 //   console.log("points list", structuresFeatures);
 
+                const createColorSymbol = (value) => ({
+                    value: value,
+                    symbol: {
+                        type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
+                        size: 8,
+                        color: colorDict[value],
+                        outline: {
+                            // autocasts as new SimpleLineSymbol()
+                            width: 1.5,
+                            color: "white",
+                        },
+                    },
+                    label: value
+                })
                 return new FeatureLayer({
                     source: structuresFeatures,
                     objectIdField: "id",
@@ -254,6 +278,10 @@ const MyMap = () => {
                             type: "string",
                         },
                         {
+                            name: "mark",
+                            type: "string",
+                        },
+                        {
                             name: "attributes",
                             type: "string",
                         },
@@ -274,18 +302,11 @@ const MyMap = () => {
                             "<li>Attributes: {attributes}</li>" +
                             "</ul>",
                     },
+
                     renderer: {
-                        type: "simple", // autocasts as new SimpleRenderer()
-                        symbol: {
-                            type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
-                            size: 6,
-                            color: "red",
-                            outline: {
-                                // autocasts as new SimpleLineSymbol()
-                                width: 0.5,
-                                color: "white",
-                            },
-                        },
+                        type: "unique-value",
+                        field: "profile",
+                        uniqueValueInfos: profileNoList.map(profileNo => createColorSymbol(profileNo))
                     },
                     labelingInfo: structuresLabels,
                     title: "Structure Points",
@@ -350,9 +371,9 @@ const MyMap = () => {
                     type: "text",
                     color: "red",
                     haloColor: "white",
-                    haloSize: "1px",
+                    haloSize: "1.5px",
                     font: {
-                        size: "16px",
+                        size: "18px",
                         family: "Noto Sans",
                         style: "italic",
                         weight: "bolder",
@@ -360,7 +381,7 @@ const MyMap = () => {
                 },
                 labelPlacement: "above-right",
                 labelExpressionInfo: {
-                    expression: "$feature.id + ' - ' + $feature.order",
+                    expression: "$feature.mark + '' + $feature.order",
                 },
                 deconflictionStrategy: "static",
             };
@@ -372,7 +393,7 @@ const MyMap = () => {
                     haloColor: "white",
                     haloSize: "1px",
                     font: {
-                        size: "12px",
+                        size: "15px",
                         family: "Noto Sans",
                         style: "italic",
                         weight: "bolder",

@@ -11,10 +11,11 @@ const MyDropZone = () => {
             .filter(item => !!item)
             .map(item => {
                     const obj = item.data
-                    if (item.data.order && item.data.order.length > 0) {
+                    if (item.data.order) {
                         return {
                             id: obj.id,
                             code: obj.code,
+                            mark: obj.struc_mark,
                             profile: obj.profile,
                             order: obj.order,
                             longitude: parseFloat(obj.longitude),
