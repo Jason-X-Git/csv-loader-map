@@ -20,7 +20,7 @@ const MyDropZone = () => {
                             longitude: parseFloat(obj.longitude),
                             latitude: parseFloat(obj.latitude),
                             measure: parseFloat(obj.measure),
-                            attributes: null,
+                            attributes: obj.attributes,
                         }
 
                     } else {
@@ -30,7 +30,7 @@ const MyDropZone = () => {
                             code: obj.code,
                             longitude: parseFloat(obj.longitude),
                             latitude: parseFloat(obj.latitude),
-                            attributes: null,
+                            attributes: obj.attributes,
                         }
                     }
                 }

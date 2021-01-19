@@ -65,20 +65,23 @@ const MyMap = () => {
                 options
             );
 
-            const buildStructurePoints = () => {
+            const buildPointsFeatures = (points) => {
                 //loop through the items and add to the feature layer
                 const features = [];
-                array.forEach(structurePoints, function (item) {
+                array.forEach(points, function (item) {
                     // console.log("item", item);
                     const attr = {};
                     //pull in any additional attributes if required
                     attr["id"] = item.id;
-                    attr["profile"] = item.profile;
-                    attr["order"] = item.order;
+                    if (item.order) {
+                        attr["profile"] = item.profile;
+                        attr["order"] = item.order;
+                        attr["measure"] = item.measure;
+                    }
                     attr["longitude"] = item.longitude;
                     attr["latitude"] = item.latitude;
-                    attr["measure"] = item.measure;
                     attr["code"] = item.code;
+                    attr["attributes"] = item.attributes;
 
                     const geometry = new Point(item.longitude, item.latitude);
 
@@ -93,32 +96,6 @@ const MyMap = () => {
                 return features;
             }
 
-
-            const buildOtherPoints = () => {
-                //loop through the items and add to the feature layer
-                const features = [];
-                array.forEach(otherPoints, function (item) {
-                    // console.log("item", item);
-                    const attr = {};
-                    //pull in any additional attributes if required
-                    attr["id"] = item.id;
-                    attr["longitude"] = item.longitude;
-                    attr["latitude"] = item.latitude;
-                    attr["code"] = item.code;
-                    // attr["attributes"] = item.attributes;
-
-                    const geometry = new Point(item.longitude, item.latitude);
-
-                    const graphic = new Graphic({
-                        geometry: geometry,
-                        attributes: attr,
-                    });
-                    features.push(graphic);
-                });
-
-                  console.log("retrieved ", features.length, " points");
-                return features;
-            }
 
             const groupBy = (key) => (array) =>
                 array.reduce((objectsByKeyValue, obj) => {
@@ -241,7 +218,7 @@ const MyMap = () => {
 
             //  Creates a client-side FeatureLayer from an array of graphics
             const createStructuresPointsLayer = () => {
-                const structuresFeatures = buildStructurePoints();
+                const structuresFeatures = buildPointsFeatures(structurePoints);
                 //   console.log("points list", structuresFeatures);
 
                 return new FeatureLayer({
@@ -276,6 +253,10 @@ const MyMap = () => {
                             name: "code",
                             type: "string",
                         },
+                        {
+                            name: "attributes",
+                            type: "string",
+                        },
                     ],
                     popupTemplate: {
                         title: "Structure Point",
@@ -287,14 +268,18 @@ const MyMap = () => {
                             },
                         ],
                         content:
-                            "Point {id}. Order {order}. Measure: {expression/measure-roundup} m",
+                            "<p>Point <b>{id} ({code})</b>" +
+                            "<ul><li>Order: {order}</li>" +
+                            "<li>Measure: {expression/measure-roundup} m</li>" +
+                            "<li>Attributes: {attributes}</li>" +
+                            "</ul>",
                     },
                     renderer: {
                         type: "simple", // autocasts as new SimpleRenderer()
                         symbol: {
                             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
                             size: 6,
-                            color: "blue",
+                            color: "red",
                             outline: {
                                 // autocasts as new SimpleLineSymbol()
                                 width: 0.5,
@@ -309,7 +294,7 @@ const MyMap = () => {
 
 
             const createOtherPointsLayer = () => {
-                const otherPointsFeatures = buildOtherPoints();
+                const otherPointsFeatures = buildPointsFeatures(otherPoints);
                 console.log("other points number", otherPointsFeatures.length);
                 return new FeatureLayer({
                     source: otherPointsFeatures,
@@ -331,18 +316,23 @@ const MyMap = () => {
                             name: "code",
                             type: "string",
                         },
+                        {
+                            name: "attributes",
+                            type: "string",
+                        },
                     ],
                     popupTemplate: {
                         title: "Non-Structure Point",
                         content:
-                            "Point {id} - {code}.",
+                            "<p>Point <b>{id} ({code})</b></p>" +
+                            "<ul><li>{attributes}</li><ul>",
                     },
                     renderer: {
                         type: "simple", // autocasts as new SimpleRenderer()
                         symbol: {
                             type: "simple-marker", // autocasts as new SimpleMarkerSymbol()
                             size: 5,
-                            color: "black",
+                            color: "blue",
                             outline: {
                                 // autocasts as new SimpleLineSymbol()
                                 width: 0.5,
@@ -370,7 +360,7 @@ const MyMap = () => {
                 },
                 labelPlacement: "above-right",
                 labelExpressionInfo: {
-                    expression: "$feature.profile + ' - ' + $feature.order",
+                    expression: "$feature.id + ' - ' + $feature.order",
                 },
                 deconflictionStrategy: "static",
             };
@@ -378,11 +368,11 @@ const MyMap = () => {
             const otherPointsLabels = {
                 symbol: {
                     type: "text",
-                    color: "black",
+                    color: "blue",
                     haloColor: "white",
                     haloSize: "1px",
                     font: {
-                        size: "13px",
+                        size: "12px",
                         family: "Noto Sans",
                         style: "italic",
                         weight: "bolder",
@@ -390,7 +380,7 @@ const MyMap = () => {
                 },
                 labelPlacement: "above-right",
                 labelExpressionInfo: {
-                    expression: "$feature.code",
+                    expression: "$feature.id + ' - ' + $feature.code",
                 },
                 deconflictionStrategy: "static",
             };
