@@ -1,0 +1,194 @@
+[
+  {
+    "id": "12500",
+    "code": "STRU_#",
+    "mark": "STR#0",
+    "profile": "1",
+    "order": "0",
+    "structureAngles": "",
+    "longitude": -114.92217033152966,
+    "latitude": 51.17646547691987,
+    "measure": 0
+  },
+  {
+    "id": "12501",
+    "code": "STRU_#",
+    "mark": "STR#01",
+    "profile": "1",
+    "order": "01",
+    "structureAngles": "running angle deflection 75d25m47s LT",
+    "longitude": -114.92218365118954,
+    "latitude": 51.17673498760517,
+    "measure": 29.98
+  },
+
+  {
+    "id": "12504",
+    "code": "STRU_#",
+    "mark": "STR#04",
+    "profile": "1",
+    "order": "04",
+    "structureAngles": "running angle deflection 33d8m47s RT",
+    "longitude": -114.92488673814174,
+    "latitude": 51.17717828241487,
+    "measure": 225.45
+  },
+
+  {
+    "id": "12510",
+    "code": "STRU_#",
+    "mark": "STR#10",
+    "profile": "1",
+    "order": "10",
+    "structureAngles": "running angle deflection 9d22m16s RT",
+    "longitude": -114.9289901752321,
+    "latitude": 51.18066266146573,
+    "measure": 707.58
+  },
+  {
+    "id": "12511",
+    "code": "STRU_#",
+    "mark": "STR#11",
+    "profile": "1",
+    "order": "11",
+    "structureAngles": "running angle deflection 8d56m10s LT",
+    "longitude": -114.92964141071008,
+    "latitude": 51.18146318943601,
+    "measure": 807.56
+  },
+  {
+    "id": "12512",
+    "code": "STRU_#",
+    "mark": "STR#12",
+    "profile": "1",
+    "order": "12",
+    "structureAngles": "running angle deflection 19d58m08s LT",
+    "longitude": -114.9303981300459,
+    "latitude": 51.18211737684928,
+    "measure": 897.51
+  },
+  {
+    "id": "12513",
+    "code": "STRU_#",
+    "mark": "STR#13",
+    "profile": "1",
+    "order": "13",
+    "structureAngles": "running angle deflection 9d21m48s LT",
+    "longitude": -114.93141509357243,
+    "latitude": 51.18254869969355,
+    "measure": 983.25
+  },
+
+  {
+    "id": "12516",
+    "code": "STRU_#",
+    "mark": "STR#16",
+    "profile": "1",
+    "order": "16",
+    "structureAngles": "running angle deflection 11d24m28s LT",
+    "longitude": -114.93479418168356,
+    "latitude": 51.183523116584226,
+    "measure": 1243.15
+  },
+  {
+    "id": "12517",
+    "code": "STRU_#",
+    "mark": "STR#18",
+    "profile": "1",
+    "order": "18",
+    "structureAngles": "running angle deflection 24d49m50s RT",
+    "longitude": -114.93760769347334,
+    "latitude": 51.18384495191919,
+    "measure": 1443.08
+  },
+
+  {
+    "id": "12518",
+    "code": "STRU_#",
+    "mark": "STR#19",
+    "profile": "1",
+    "order": "19",
+    "structureAngles": "running angle deflection 44d52m23s RT",
+    "longitude": -114.93790514249326,
+    "latitude": 51.183969522061005,
+    "measure": 1468.06
+  },
+  {
+    "id": "12520",
+    "code": "STRU_#",
+    "mark": "STR#22",
+    "profile": "1",
+    "order": "22",
+    "structureAngles": "running angle deflection 33d19m34s RT",
+    "longitude": -114.938323765024,
+    "latitude": 51.18526865967953,
+    "measure": 1615.46
+  },
+  {
+    "id": "12521",
+    "code": "STRU_#",
+    "mark": "STR#30",
+    "profile": "1",
+    "order": "30",
+    "structureAngles": "running angle deflection 5d28m30s LT",
+    "longitude": -114.93742186843293,
+    "latitude": 51.189026510467386,
+    "measure": 2091
+  },
+  {
+    "id": "12522",
+    "code": "STRU_#",
+    "mark": "STR#29",
+    "profile": "1",
+    "order": "29",
+    "structureAngles": "tap deflection 53d39m18s RT profile 3",
+    "longitude": -114.93720160789876,
+    "latitude": 51.18859890835677,
+    "measure": 2041.03
+  },
+  {
+    "id": "12800",
+    "code": "STRU_#",
+    "mark": "STR#0",
+    "profile": "1A",
+    "order": "0",
+    "structureAngles": "tap deflection 53d39m18s LT profile 8C",
+    "longitude": -114.93720160789876,
+    "latitude": 51.18859890835677,
+    "measure": 0
+  },
+  {
+    "id": "12801",
+    "code": "STRU_#",
+    "mark": "STR#2",
+    "profile": "1A",
+    "order": "2",
+    "structureAngles": "running angle deflection 38d57m52s RT",
+    "longitude": -114.93685050022546,
+    "latitude": 51.188905732471795,
+    "measure": 42.03
+  },
+  {
+    "id": "12802",
+    "code": "STRU_#",
+    "mark": "STR#1",
+    "profile": "1A",
+    "order": "1",
+    "structureAngles": "",
+    "longitude": -114.93702623287201,
+    "latitude": 51.18875217530622,
+    "measure": 20.99
+  },
+
+  {
+    "id": "12804",
+    "code": "STRU_#",
+    "mark": "STR#4",
+    "profile": "1A",
+    "order": "4",
+    "structureAngles": "",
+    "longitude": -114.9349356516973,
+    "latitude": 51.189240625431495,
+    "measure": 180.92
+  }
+]
